@@ -17,13 +17,15 @@ type CreateIndexRequest struct {
 
 // IndexDefaults is the defaults for the index
 type IndexDefaults struct {
-	TreatURLAndPointersAsImages *bool               `json:"treat_url_and_pointers_as_images"`
-	Model                       *string             `json:"model"`
-	ModelProperties             *ModelProperties    `json:"model_properties"`
-	NormalizeEmbeddings         *bool               `json:"normalize_embeddings"`
-	TextPreprocessing           *TextPreprocessing  `json:"text_preprocessing"`
-	ImagePreprocessing          *ImagePreprocessing `json:"image_preprocessing"`
-	ANNParameters               *ANNParameters      `json:"ann_parameters"`
+	// Fetch images from points and URLs (default: false)
+	TreatURLAndPointersAsImages *bool `json:"treat_url_and_pointers_as_images"`
+	// Model to use for the index (default: hf/all_datasets_v4_MiniLM-L6)
+	Model               *string             `json:"model"`
+	ModelProperties     *ModelProperties    `json:"model_properties"`
+	NormalizeEmbeddings *bool               `json:"normalize_embeddings"`
+	TextPreprocessing   *TextPreprocessing  `json:"text_preprocessing"`
+	ImagePreprocessing  *ImagePreprocessing `json:"image_preprocessing"`
+	ANNParameters       *ANNParameters      `json:"ann_parameters"`
 }
 
 // ModelProperties are the properties for the model
@@ -77,6 +79,20 @@ func setDefaultCreateIndexRequest(createIndexReq *CreateIndexRequest) {
 	if createIndexReq.NumberOfReplicas == nil {
 		createIndexReq.NumberOfReplicas = new(int)
 		*createIndexReq.NumberOfReplicas = 0
+	}
+
+	if createIndexReq.IndexDefaults == nil {
+		createIndexReq.IndexDefaults = new(IndexDefaults)
+	}
+
+	if createIndexReq.IndexDefaults.TreatURLAndPointersAsImages == nil {
+		createIndexReq.IndexDefaults.TreatURLAndPointersAsImages = new(bool)
+		*createIndexReq.IndexDefaults.TreatURLAndPointersAsImages = false
+	}
+
+	if createIndexReq.IndexDefaults.Model == nil {
+		createIndexReq.IndexDefaults.Model = new(string)
+		*createIndexReq.IndexDefaults.Model = "hf/all_datasets_v4_MiniLM-L6"
 	}
 }
 
