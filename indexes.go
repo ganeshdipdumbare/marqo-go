@@ -1,7 +1,6 @@
 package marqo
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -9,61 +8,62 @@ import (
 // CreateIndexRequest is the request to create an index
 type CreateIndexRequest struct {
 	IndexName     string         `json:"-" validate:"required"`
-	IndexDefaults *IndexDefaults `json:"index_defaults"`
+	IndexDefaults *IndexDefaults `json:"index_defaults,omitempty"`
 	// Number of shards for the index (default: 3)
-	NumberOfShards *int `json:"number_of_shards"`
+	NumberOfShards *int `json:"number_of_shards,omitempty"`
 	// Number of replicas for the index (default: 0)
-	NumberOfReplicas *int `json:"number_of_replicas"`
+	NumberOfReplicas *int `json:"number_of_replicas,omitempty"`
 }
 
 // IndexDefaults is the defaults for the index
 type IndexDefaults struct {
 	// Fetch images from points and URLs (default: false)
-	TreatURLAndPointersAsImages *bool `json:"treat_url_and_pointers_as_images"`
+	TreatURLsAndPointersAsImages *bool `json:"treat_urls_and_pointers_as_images,omitempty"`
 	// Model to vectorize doc content (default: hf/all_datasets_v4_MiniLM-L6)
-	Model           *string          `json:"model"`
-	ModelProperties *ModelProperties `json:"model_properties"`
+	Model           *string          `json:"model,omitempty"`
+	ModelProperties *ModelProperties `json:"model_properties,omitempty"`
+	// TODO: add search model support in the future
 	// SearchModel to vectorize queries (default: hf/all_datasets_v4_MiniLM-L6)
-	SearchModel           *string          `json:"search_model"`
-	SearchModelProperties *ModelProperties `json:"search_model_properties"`
+	// SearchModel           *string          `json:"search_model,omitempty"`
+	// SearchModelProperties *ModelProperties `json:"search_model_properties,omitempty"`
 	// Normalize embeddings to have unit length (default: true)
-	NormalizeEmbeddings *bool               `json:"normalize_embeddings"`
-	TextPreprocessing   *TextPreprocessing  `json:"text_preprocessing"`
-	ImagePreprocessing  *ImagePreprocessing `json:"image_preprocessing"`
-	ANNParameters       *ANNParameters      `json:"ann_parameters"`
+	NormalizeEmbeddings *bool               `json:"normalize_embeddings,omitempty"`
+	TextPreprocessing   *TextPreprocessing  `json:"text_preprocessing,omitempty"`
+	ImagePreprocessing  *ImagePreprocessing `json:"image_preprocessing,omitempty"`
+	ANNParameters       *ANNParameters      `json:"ann_parameters,omitempty"`
 }
 
 // ModelProperties are the properties for the model
 type ModelProperties struct {
-	Name       *string `json:"name"`
-	Dimensions *int    `json:"dimensions"`
-	URL        *string `json:"url"`
-	Type       *string `json:"type"`
+	Name       *string `json:"name,omitempty"`
+	Dimensions *int    `json:"dimensions,omitempty"`
+	URL        *string `json:"url,omitempty"`
+	Type       *string `json:"type,omitempty"`
 }
 
 // TextPreprocessing is the text preprocessing for the index
 type TextPreprocessing struct {
 	// SplitLength is length of chunks after splitting
 	// by split method (default: 2)
-	SplitLength *int `json:"split_length"`
+	SplitLength *int `json:"split_length,omitempty"`
 	// SplitOverlap is overlap between adjacent chunks (default: 0)
-	SplitOverlap *int `json:"split_overlap"`
+	SplitOverlap *int `json:"split_overlap,omitempty"`
 	// SplitMethod method to split text into chunks (default: "sentence", options: "sentence", "word", "character" or "passage")
-	SplitMethod *string `json:"split_method"`
+	SplitMethod *string `json:"split_method,omitempty"`
 }
 
 // ImagePreprocessing is the image preprocessing for the index
 type ImagePreprocessing struct {
 	// The method by which images are chunked (options: "simple" or "frcnn")
-	PatchMethod *string `json:"patch_method"`
+	PatchMethod *string `json:"patch_method,omitempty"`
 }
 
 // ANNParameters are the ANN parameters for the index
 type ANNParameters struct {
 	// The function used to measure the distance between two points in ANN (l1, l2, linf, or cosinesimil. default: cosinesimil)
-	SpaceType *string `json:"space_type"`
+	SpaceType *string `json:"space_type,omitempty"`
 	// The hyperparameters for the ANN method (which is always hnsw for Marqo).
-	Parameters *HSNWMethodParameters `json:"parameters"`
+	Parameters *HSNWMethodParameters `json:"parameters,omitempty"`
 }
 
 // HSNWMethodParameters are the HSNW method parameters for the index
@@ -72,12 +72,12 @@ type HSNWMethodParameters struct {
 	// Higher values lead to a more accurate graph but slower indexing
 	// speed. It is recommended to keep this between 2 and 800 (maximum is 4096)
 	// (default: 128)
-	EFConstruction *int `json:"ef_construction"`
+	EFConstruction *int `json:"ef_construction,omitempty"`
 	// The number of bidirectional links that the plugin creates for each
 	// new element. Increasing and decreasing this value can have a
 	// large impact on memory consumption. Keep this value between 2 and 100.
 	// (default: 16)
-	M *int `json:"m"`
+	M *int `json:"m,omitempty"`
 }
 
 // CreateIndexResponse is the response for creating an index
@@ -103,9 +103,9 @@ func setDefaultCreateIndexRequest(createIndexReq *CreateIndexRequest) {
 		createIndexReq.IndexDefaults = new(IndexDefaults)
 	}
 
-	if createIndexReq.IndexDefaults.TreatURLAndPointersAsImages == nil {
-		createIndexReq.IndexDefaults.TreatURLAndPointersAsImages = new(bool)
-		*createIndexReq.IndexDefaults.TreatURLAndPointersAsImages = false
+	if createIndexReq.IndexDefaults.TreatURLsAndPointersAsImages == nil {
+		createIndexReq.IndexDefaults.TreatURLsAndPointersAsImages = new(bool)
+		*createIndexReq.IndexDefaults.TreatURLsAndPointersAsImages = false
 	}
 
 	if createIndexReq.IndexDefaults.Model == nil {
@@ -113,11 +113,12 @@ func setDefaultCreateIndexRequest(createIndexReq *CreateIndexRequest) {
 		*createIndexReq.IndexDefaults.Model = "hf/all_datasets_v4_MiniLM-L6"
 	}
 
-	if createIndexReq.IndexDefaults.SearchModel == nil {
-		createIndexReq.IndexDefaults.SearchModel = new(string)
-		*createIndexReq.IndexDefaults.SearchModel =
-			"hf/all_datasets_v4_MiniLM-L6"
-	}
+	// TODO: add search model support in the future
+	// if createIndexReq.IndexDefaults.SearchModel == nil {
+	// 	createIndexReq.IndexDefaults.SearchModel = new(string)
+	// 	*createIndexReq.IndexDefaults.SearchModel =
+	// 		"hf/all_datasets_v4_MiniLM-L6"
+	// }
 
 	if createIndexReq.IndexDefaults.NormalizeEmbeddings == nil {
 		createIndexReq.IndexDefaults.NormalizeEmbeddings = new(bool)
@@ -186,14 +187,7 @@ func setDefaultCreateIndexRequest(createIndexReq *CreateIndexRequest) {
 func (c *Client) CreateIndex(createIndexReq *CreateIndexRequest) (*CreateIndexResponse, error) {
 	logger := c.logger.With("method", "CreateIndex")
 	setDefaultCreateIndexRequest(createIndexReq)
-	jsonBody, err := json.Marshal(createIndexReq)
-	if err != nil {
-		logger.Error("error marshalling create index request",
-			"error", err)
-		return nil, err
-	}
-	logger.Info(fmt.Sprintf("create index request: %s", jsonBody))
-	err = validate.Struct(createIndexReq)
+	err := validate.Struct(createIndexReq)
 	if err != nil {
 		logger.Error("error validating create index request",
 			"error", err)
