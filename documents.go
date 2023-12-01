@@ -10,26 +10,26 @@ import (
 type UpsertDocumentsRequest struct {
 	IndexName string `json:"-" validate:"required"`
 	// Query params
-	Refresh   *bool   `json:"refresh"`
-	Device    *string `json:"device"`
-	Telemetry *bool   `json:"telemetry"`
+	Refresh   *bool   `json:"-"`
+	Device    *string `json:"-"`
+	Telemetry *bool   `json:"-"`
 	// Body params
 	Documents            [][]byte               `json:"documents" validate:"required"`
-	TensorFields         []string               `json:"tensor_fields"`
-	UseExistingTensors   *bool                  `json:"use_existing_tensors"`
-	ImageDownloadHeaders map[string]string      `json:"image_download_headers"`
-	Mappings             map[string]interface{} `json:"mappings"`
-	ModelAuth            map[string]interface{} `json:"model_auth"`
-	TextChunkPrefix      *string                `json:"text_chunk_prefix"`
-	ClientBatchSize      *int                   `json:"client_batch_size"`
+	TensorFields         []string               `json:"tensorFields,omitempty"`
+	UseExistingTensors   *bool                  `json:"useExistingTensors,omitempty"`
+	ImageDownloadHeaders map[string]string      `json:"imageDownloadHeaders,omitempty"`
+	Mappings             map[string]interface{} `json:"mappings,omitempty"`
+	ModelAuth            map[string]interface{} `json:"modelAuth,omitempty"`
+	TextChunkPrefix      *string                `json:"textChunkPrefix,omitempty"`
+	ClientBatchSize      *int                   `json:"client_batch_size,omitempty"`
 }
 
 // UpsertDocumentsResponse is the response from the server
 type UpsertDocumentsResponse struct {
-	Errors           bool   `json:"errors"`
-	Items            []Item `json:"items"`
-	ProcessingTimeMS int    `json:"processingTimeMs"`
-	IndexName        string `json:"index_name"`
+	Errors           bool    `json:"errors"`
+	Items            []Item  `json:"items"`
+	ProcessingTimeMS float64 `json:"processingTimeMs"`
+	IndexName        string  `json:"index_name"`
 }
 
 // Item is the item from the server
