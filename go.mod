@@ -1,4 +1,4 @@
-module github.com/ganeshdipdumbare/marqo-go
+module github.com/ganeshdipdumbare/marqo
 
 go 1.21.4
 
