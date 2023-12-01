@@ -83,3 +83,69 @@ func (c *Client) UpsertDocuments(upsertDocumentsReq *UpsertDocumentsRequest) (*U
 		upsertDocumentsResp))
 	return &upsertDocumentsResp, nil
 }
+
+// DeleteDocumentsRequest is the request to delete documents
+type DeleteDocumentsRequest struct {
+	IndexName   string   `json:"-" validate:"required"`
+	DocumentIDs []string `json:"document_ids" validate:"required"`
+}
+
+// DeleteDocumentsResponse is the response from the server
+type DeleteDocumentsResponse struct {
+	IndexName string `json:"index_name"`
+	Status    string `json:"status"`
+	Type      string `json:"type"`
+	Details   struct {
+		ReceivedDocumentIds int `json:"receivedDocumentIds"`
+		DeletedDocuments    int `json:"deletedDocuments"`
+	} `json:"details"`
+	Items      []DeletedItem `json:"items"`
+	Duration   string        `json:"duration"`
+	StartedAt  string        `json:"startedAt"`
+	FinishedAt string        `json:"finishedAt"`
+}
+
+// DeletedItem is the item which was deleted
+type DeletedItem struct {
+	ID     string `json:"_id"`
+	Shards struct {
+		Total      int `json:"total"`
+		Successful int `json:"successful"`
+		Failed     int `json:"failed"`
+	} `json:"_shards"`
+	Status int    `json:"status"`
+	Result string `json:"result"`
+}
+
+// DeleteDocuments deletes documents from the server
+func (c *Client) DeleteDocuments(deleteDocumentsReq *DeleteDocumentsRequest) (*DeleteDocumentsResponse, error) {
+	logger := c.logger.With("method", "DeleteDocuments")
+	err := validate.Struct(deleteDocumentsReq)
+	if err != nil {
+		logger.Error("error validating delete documents request",
+			"error", err)
+		return nil, err
+	}
+
+	var deleteDocumentsResp DeleteDocumentsResponse
+	resp, err := c.reqClient.
+		R().
+		SetBody(deleteDocumentsReq.DocumentIDs).
+		SetSuccessResult(&deleteDocumentsResp).
+		Delete(c.reqClient.BaseURL + "/indexes/" + deleteDocumentsReq.IndexName + "/documents/delete-batch")
+
+	if err != nil {
+		logger.Error("error deleting documents", "error", err)
+		return nil, err
+	}
+	if resp.Response.StatusCode != http.StatusOK {
+		logger.Error("error deleting documents", "status_code", resp.
+			Response.StatusCode)
+		return nil, fmt.Errorf("error deleting documents: status code: %v",
+			resp.Response.StatusCode)
+	}
+
+	logger.Info(fmt.Sprintf("response delete documents: %+v",
+		deleteDocumentsResp))
+	return &deleteDocumentsResp, nil
+}
