@@ -207,7 +207,7 @@ type GetDocumentsRequest struct {
 
 // GetDocumentsResponse is the response from the server
 type GetDocumentsResponse struct {
-	Results []GetDocumentRequest `json:"results"`
+	Results []GetDocumentResponse `json:"results"`
 }
 
 // GetDocuments gets documents from the server
