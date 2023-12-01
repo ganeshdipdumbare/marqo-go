@@ -1,6 +1,7 @@
 package marqo
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -42,28 +43,41 @@ type ModelProperties struct {
 
 // TextPreprocessing is the text preprocessing for the index
 type TextPreprocessing struct {
-	SplitLength             *int    `json:"split_length"`
-	SplitOverlap            *int    `json:"split_overlap"`
-	SplitMethod             *string `json:"split_method"`
-	OverrideTextChunkPrefix *string `json:"override_text_chunk_prefix"`
-	OverrideTextQueryPrefix *string `json:"override_text_query_prefix"`
+	// SplitLength is length of chunks after splitting
+	// by split method (default: 2)
+	SplitLength *int `json:"split_length"`
+	// SplitOverlap is overlap between adjacent chunks (default: 0)
+	SplitOverlap *int `json:"split_overlap"`
+	// SplitMethod method to split text into chunks (default: "sentence", options: "sentence", "word", "character" or "passage")
+	SplitMethod *string `json:"split_method"`
 }
 
 // ImagePreprocessing is the image preprocessing for the index
 type ImagePreprocessing struct {
+	// The method by which images are chunked (options: "simple" or "frcnn")
 	PatchMethod *string `json:"patch_method"`
 }
 
 // ANNParameters are the ANN parameters for the index
 type ANNParameters struct {
-	SpaceType  *string               `json:"space_type"`
+	// The function used to measure the distance between two points in ANN (l1, l2, linf, or cosinesimil. default: cosinesimil)
+	SpaceType *string `json:"space_type"`
+	// The hyperparameters for the ANN method (which is always hnsw for Marqo).
 	Parameters *HSNWMethodParameters `json:"parameters"`
 }
 
 // HSNWMethodParameters are the HSNW method parameters for the index
 type HSNWMethodParameters struct {
+	// The size of the dynamic list used during k-NN graph creation.
+	// Higher values lead to a more accurate graph but slower indexing
+	// speed. It is recommended to keep this between 2 and 800 (maximum is 4096)
+	// (default: 128)
 	EFConstruction *int `json:"ef_construction"`
-	M              *int `json:"m"`
+	// The number of bidirectional links that the plugin creates for each
+	// new element. Increasing and decreasing this value can have a
+	// large impact on memory consumption. Keep this value between 2 and 100.
+	// (default: 16)
+	M *int `json:"m"`
 }
 
 // CreateIndexResponse is the response for creating an index
@@ -101,15 +115,85 @@ func setDefaultCreateIndexRequest(createIndexReq *CreateIndexRequest) {
 
 	if createIndexReq.IndexDefaults.SearchModel == nil {
 		createIndexReq.IndexDefaults.SearchModel = new(string)
-		*createIndexReq.IndexDefaults.SearchModel = "hf/all_datasets_v4_MiniLM-L6"
+		*createIndexReq.IndexDefaults.SearchModel =
+			"hf/all_datasets_v4_MiniLM-L6"
 	}
+
+	if createIndexReq.IndexDefaults.NormalizeEmbeddings == nil {
+		createIndexReq.IndexDefaults.NormalizeEmbeddings = new(bool)
+		*createIndexReq.IndexDefaults.NormalizeEmbeddings = true
+	}
+
+	if createIndexReq.IndexDefaults.TextPreprocessing != nil {
+		if createIndexReq.IndexDefaults.TextPreprocessing.SplitLength == nil {
+			createIndexReq.IndexDefaults.TextPreprocessing.SplitLength =
+				new(int)
+			*createIndexReq.IndexDefaults.TextPreprocessing.SplitLength = 2
+		}
+
+		if createIndexReq.IndexDefaults.TextPreprocessing.SplitOverlap == nil {
+			createIndexReq.IndexDefaults.TextPreprocessing.SplitOverlap =
+				new(int)
+			*createIndexReq.IndexDefaults.TextPreprocessing.SplitOverlap = 0
+		}
+
+		if createIndexReq.IndexDefaults.TextPreprocessing.SplitMethod == nil {
+			createIndexReq.IndexDefaults.TextPreprocessing.SplitMethod =
+				new(string)
+			*createIndexReq.IndexDefaults.TextPreprocessing.SplitMethod =
+				"sentence"
+		}
+	}
+
+	if createIndexReq.IndexDefaults.ImagePreprocessing != nil {
+		if createIndexReq.IndexDefaults.ImagePreprocessing.PatchMethod == nil {
+			createIndexReq.IndexDefaults.ImagePreprocessing.PatchMethod =
+				new(string)
+			*createIndexReq.IndexDefaults.ImagePreprocessing.PatchMethod =
+				"simple"
+		}
+	}
+
+	if createIndexReq.IndexDefaults.ANNParameters != nil {
+		if createIndexReq.IndexDefaults.ANNParameters.SpaceType == nil {
+			createIndexReq.IndexDefaults.ANNParameters.SpaceType = new(string)
+			*createIndexReq.IndexDefaults.ANNParameters.SpaceType =
+				"cosinesimil"
+		}
+
+		if createIndexReq.IndexDefaults.ANNParameters.Parameters == nil {
+			createIndexReq.IndexDefaults.ANNParameters.Parameters =
+				new(HSNWMethodParameters)
+		}
+
+		if createIndexReq.IndexDefaults.ANNParameters.Parameters.EFConstruction ==
+			nil {
+			createIndexReq.IndexDefaults.ANNParameters.Parameters.EFConstruction =
+				new(int)
+			*createIndexReq.IndexDefaults.ANNParameters.Parameters.EFConstruction =
+				128
+		}
+
+		if createIndexReq.IndexDefaults.ANNParameters.Parameters.M == nil {
+			createIndexReq.IndexDefaults.ANNParameters.Parameters.M = new(int)
+			*createIndexReq.IndexDefaults.ANNParameters.Parameters.M = 16
+		}
+	}
+
 }
 
 // CreateIndex creates an index
 func (c *Client) CreateIndex(createIndexReq *CreateIndexRequest) (*CreateIndexResponse, error) {
 	logger := c.logger.With("method", "CreateIndex")
 	setDefaultCreateIndexRequest(createIndexReq)
-	err := validate.Struct(createIndexReq)
+	jsonBody, err := json.Marshal(createIndexReq)
+	if err != nil {
+		logger.Error("error marshalling create index request",
+			"error", err)
+		return nil, err
+	}
+	logger.Info(fmt.Sprintf("create index request: %s", jsonBody))
+	err = validate.Struct(createIndexReq)
 	if err != nil {
 		logger.Error("error validating create index request",
 			"error", err)
