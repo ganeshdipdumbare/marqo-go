@@ -67,9 +67,23 @@ type CreateIndexResponse struct {
 	Index              string `json:"index"`
 }
 
+// setDefaultCreateIndexRequest add default values to createIndexRequest if not set
+func setDefaultCreateIndexRequest(createIndexReq *CreateIndexRequest) {
+	if createIndexReq.NumberOfShards == nil {
+		createIndexReq.NumberOfShards = new(int)
+		*createIndexReq.NumberOfShards = 3
+	}
+
+	if createIndexReq.NumberOfReplicas == nil {
+		createIndexReq.NumberOfReplicas = new(int)
+		*createIndexReq.NumberOfReplicas = 0
+	}
+}
+
 // CreateIndex creates an index
 func (c *Client) CreateIndex(createIndexReq *CreateIndexRequest) (*CreateIndexResponse, error) {
 	logger := c.logger.With("method", "CreateIndex")
+	setDefaultCreateIndexRequest(createIndexReq)
 	err := validate.Struct(createIndexReq)
 	if err != nil {
 		logger.Error("error validating create index request",
