@@ -19,9 +19,13 @@ type CreateIndexRequest struct {
 type IndexDefaults struct {
 	// Fetch images from points and URLs (default: false)
 	TreatURLAndPointersAsImages *bool `json:"treat_url_and_pointers_as_images"`
-	// Model to use for the index (default: hf/all_datasets_v4_MiniLM-L6)
-	Model               *string             `json:"model"`
-	ModelProperties     *ModelProperties    `json:"model_properties"`
+	// Model to vectorize doc content (default: hf/all_datasets_v4_MiniLM-L6)
+	Model           *string          `json:"model"`
+	ModelProperties *ModelProperties `json:"model_properties"`
+	// SearchModel to vectorize queries (default: hf/all_datasets_v4_MiniLM-L6)
+	SearchModel           *string          `json:"search_model"`
+	SearchModelProperties *ModelProperties `json:"search_model_properties"`
+	// Normalize embeddings to have unit length (default: true)
 	NormalizeEmbeddings *bool               `json:"normalize_embeddings"`
 	TextPreprocessing   *TextPreprocessing  `json:"text_preprocessing"`
 	ImagePreprocessing  *ImagePreprocessing `json:"image_preprocessing"`
