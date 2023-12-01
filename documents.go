@@ -14,7 +14,7 @@ type UpsertDocumentsRequest struct {
 	Device    *string `json:"-"`
 	Telemetry *bool   `json:"-"`
 	// Body params
-	Documents            [][]byte               `json:"documents" validate:"required"`
+	Documents            []interface{}          `json:"documents" validate:"required"`
 	TensorFields         []string               `json:"tensorFields,omitempty"`
 	UseExistingTensors   *bool                  `json:"useExistingTensors,omitempty"`
 	ImageDownloadHeaders map[string]string      `json:"imageDownloadHeaders,omitempty"`
