@@ -197,3 +197,54 @@ func (c *Client) GetDocument(getDocumentReq *GetDocumentRequest) (*GetDocumentRe
 		getDocumentResp))
 	return &getDocumentResp, nil
 }
+
+// GetDocumentsRequest is the request to get documents
+type GetDocumentsRequest struct {
+	IndexName    string   `json:"-" validate:"required"`
+	DocumentIDs  []string `json:"document_ids" validate:"required"`
+	ExposeFacets bool     `json:"expose_facets,omitempty"`
+}
+
+// GetDocumentsResponse is the response from the server
+type GetDocumentsResponse struct {
+	Results []GetDocumentRequest `json:"results"`
+}
+
+// GetDocuments gets documents from the server
+func (c *Client) GetDocuments(getDocumentsReq *GetDocumentsRequest) (*GetDocumentsResponse, error) {
+	logger := c.logger.With("method", "GetDocuments")
+	err := validate.Struct(getDocumentsReq)
+	if err != nil {
+		logger.Error("error validating get documents request",
+			"error", err)
+		return nil, err
+	}
+
+	var getDocumentsResp GetDocumentsResponse
+	queryParams := map[string]string{}
+	if getDocumentsReq.ExposeFacets {
+		queryParams["expose_facets"] = strconv.FormatBool(getDocumentsReq.ExposeFacets)
+	}
+
+	resp, err := c.reqClient.
+		R().
+		SetQueryParams(queryParams).
+		SetBody(getDocumentsReq.DocumentIDs).
+		SetSuccessResult(&getDocumentsResp).
+		Post(c.reqClient.BaseURL + "/indexes/" + getDocumentsReq.IndexName + "/documents")
+
+	if err != nil {
+		logger.Error("error getting documents", "error", err)
+		return nil, err
+	}
+	if resp.Response.StatusCode != http.StatusOK {
+		logger.Error("error getting documents", "status_code", resp.
+			Response.StatusCode)
+		return nil, fmt.Errorf("error getting documents: status code: %v",
+			resp.Response.StatusCode)
+	}
+
+	logger.Info(fmt.Sprintf("response get documents: %+v",
+		getDocumentsResp))
+	return &getDocumentsResp, nil
+}
