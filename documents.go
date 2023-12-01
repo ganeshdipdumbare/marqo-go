@@ -132,7 +132,7 @@ func (c *Client) DeleteDocuments(deleteDocumentsReq *DeleteDocumentsRequest) (*D
 		R().
 		SetBody(deleteDocumentsReq.DocumentIDs).
 		SetSuccessResult(&deleteDocumentsResp).
-		Delete(c.reqClient.BaseURL + "/indexes/" + deleteDocumentsReq.IndexName + "/documents/delete-batch")
+		Post(c.reqClient.BaseURL + "/indexes/" + deleteDocumentsReq.IndexName + "/documents/delete-batch")
 
 	if err != nil {
 		logger.Error("error deleting documents", "error", err)
