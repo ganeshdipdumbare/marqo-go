@@ -98,6 +98,11 @@ func setDefaultCreateIndexRequest(createIndexReq *CreateIndexRequest) {
 		createIndexReq.IndexDefaults.Model = new(string)
 		*createIndexReq.IndexDefaults.Model = "hf/all_datasets_v4_MiniLM-L6"
 	}
+
+	if createIndexReq.IndexDefaults.SearchModel == nil {
+		createIndexReq.IndexDefaults.SearchModel = new(string)
+		*createIndexReq.IndexDefaults.SearchModel = "hf/all_datasets_v4_MiniLM-L6"
+	}
 }
 
 // CreateIndex creates an index
