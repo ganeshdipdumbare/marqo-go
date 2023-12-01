@@ -149,3 +149,51 @@ func (c *Client) DeleteDocuments(deleteDocumentsReq *DeleteDocumentsRequest) (*D
 		deleteDocumentsResp))
 	return &deleteDocumentsResp, nil
 }
+
+// GetDocumentRequest is the request to get a document
+type GetDocumentRequest struct {
+	IndexName    string `json:"-" validate:"required"`
+	DocumentID   string `json:"document_id" validate:"required"`
+	ExposeFacets bool   `json:"expose_facets,omitempty"`
+}
+
+// GetDocumentResponse is the response from the server
+type GetDocumentResponse map[string]interface{}
+
+// GetDocument gets a document from the server
+func (c *Client) GetDocument(getDocumentReq *GetDocumentRequest) (*GetDocumentResponse, error) {
+	logger := c.logger.With("method", "GetDocument")
+	err := validate.Struct(getDocumentReq)
+	if err != nil {
+		logger.Error("error validating get document request",
+			"error", err)
+		return nil, err
+	}
+
+	var getDocumentResp GetDocumentResponse
+	queryParams := map[string]string{}
+	if getDocumentReq.ExposeFacets {
+		queryParams["expose_facets"] = strconv.FormatBool(getDocumentReq.ExposeFacets)
+	}
+
+	resp, err := c.reqClient.
+		R().
+		SetQueryParams(queryParams).
+		SetSuccessResult(&getDocumentResp).
+		Get(c.reqClient.BaseURL + "/indexes/" + getDocumentReq.IndexName + "/documents/" + getDocumentReq.DocumentID)
+
+	if err != nil {
+		logger.Error("error getting document", "error", err)
+		return nil, err
+	}
+	if resp.Response.StatusCode != http.StatusOK {
+		logger.Error("error getting document", "status_code", resp.
+			Response.StatusCode)
+		return nil, fmt.Errorf("error getting document: status code: %v",
+			resp.Response.StatusCode)
+	}
+
+	logger.Info(fmt.Sprintf("response get document: %+v",
+		getDocumentResp))
+	return &getDocumentResp, nil
+}
