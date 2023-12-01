@@ -231,7 +231,7 @@ func (c *Client) GetDocuments(getDocumentsReq *GetDocumentsRequest) (*GetDocumen
 		SetQueryParams(queryParams).
 		SetBody(getDocumentsReq.DocumentIDs).
 		SetSuccessResult(&getDocumentsResp).
-		Post(c.reqClient.BaseURL + "/indexes/" + getDocumentsReq.IndexName + "/documents")
+		Get(c.reqClient.BaseURL + "/indexes/" + getDocumentsReq.IndexName + "/documents")
 
 	if err != nil {
 		logger.Error("error getting documents", "error", err)
