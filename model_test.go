@@ -8,7 +8,7 @@ import (
 	"github.com/imroc/req/v3"
 )
 
-func TestClient_Model(t *testing.T) {
+func TestClient_GetModels(t *testing.T) {
 	type fields struct {
 		url    string
 		logger *slog.Logger
@@ -29,13 +29,13 @@ func TestClient_Model(t *testing.T) {
 				logger:    tt.fields.logger,
 				reqClient: tt.fields.client,
 			}
-			got, err := c.Model()
+			got, err := c.GetModels()
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Client.Model() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Client.GetModels() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Client.Model() = %v, want %v", got, tt.want)
+				t.Errorf("Client.GetModels() = %v, want %v", got, tt.want)
 			}
 		})
 	}

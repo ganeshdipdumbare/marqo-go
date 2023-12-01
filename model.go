@@ -22,7 +22,7 @@ type Model struct {
 }
 
 // Model returns the loaded models from the server
-func (c *Client) Model() (*GetModelsResponse, error) {
+func (c *Client) GetModels() (*GetModelsResponse, error) {
 	logger := c.logger.With("method", "Model")
 	var result GetModelsResponse
 
