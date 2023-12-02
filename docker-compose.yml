@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  marqo-os:
+    image: marqoai/marqo-os:0.0.3-arm
+    environment:
+      - "discovery.type=single-node"
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+  marqo:
+    image: marqoai/marqo:latest
+    environment:
+      - "OPENSEARCH_URL=https://marqo-os:9200"
+    ports:
+      - "8882:8882"
+    restart: unless-stopped
