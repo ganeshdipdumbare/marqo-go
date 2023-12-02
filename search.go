@@ -9,7 +9,8 @@ import (
 // SearchRequest is the request to search
 type SearchRequest struct {
 	// IndexName is the name of the index
-	IndexName *string `json:"-" validate:"required"`
+	// Note: only used in search request
+	IndexName string `json:"-" validate:"required"`
 
 	// Body params
 	// This is used inside bulk search request body params
@@ -159,14 +160,12 @@ func (c *Client) Search(searchReq *SearchRequest) (*SearchResponse, error) {
 	}
 
 	// Remove index name from body
-	indexName := searchReq.IndexName
-	searchReq.IndexName = ""
 	resp, err := c.reqClient.
 		R().
 		SetQueryParams(queryParams).
 		SetBody(searchReq).
 		SetSuccessResult(&searchResp).
-		Post(c.reqClient.BaseURL + "/indexes/" + indexName + "/search")
+		Post(c.reqClient.BaseURL + "/indexes/" + searchReq.IndexName + "/search")
 	if err != nil {
 		logger.Error("error searching", "error", err)
 		return nil, err
