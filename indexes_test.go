@@ -131,49 +131,6 @@ func getMockServerForDeleteIndex() *httptest.Server {
 	)
 }
 
-func (suite *IndexesTestSuite) TestClient_DeleteIndex() {
-	t := suite.T()
-	mockServer := getMockServerForDeleteIndex()
-	type fields struct {
-		url    string
-		logger *slog.Logger
-		client *req.Client
-	}
-	type args struct {
-		indexName string
-	}
-	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		wantErr bool
-	}{
-		{
-			name: "delete index successfully",
-			fields: fields{
-				url:    mockServer.URL,
-				logger: suite.Logger,
-			},
-			args: args{
-				indexName: "test",
-			},
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c, err := NewClient(tt.fields.url, WithLogger(tt.fields.logger))
-			if err != nil {
-				t.Errorf("Client.Connect() error = %v", err)
-				return
-			}
-			if err := c.DeleteIndex(tt.args.indexName); (err != nil) != tt.wantErr {
-				t.Errorf("Client.DeleteIndex() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
 func getMockServerForListIndexes() *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {

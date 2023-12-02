@@ -215,25 +215,44 @@ func (c *Client) CreateIndex(createIndexReq *CreateIndexRequest) (*CreateIndexRe
 	return &createIndexResp, nil
 }
 
+// DeleteIndexRequest is the request to delete an index
+type DeleteIndexRequest struct {
+	IndexName string `validate:"required" json:"-"`
+}
+
+// DeleteIndexResponse is the response for deleting an index
+type DeleteIndexResponse struct {
+	Acknowledged bool `json:"acknowledged"`
+}
+
 // DeleteIndex deletes an index
-func (c *Client) DeleteIndex(indexName string) error {
+func (c *Client) DeleteIndex(deleteIndexRequest *DeleteIndexRequest) (*DeleteIndexResponse, error) {
 	logger := c.logger.With("method", "DeleteIndex")
+	err := validate.Struct(deleteIndexRequest)
+	if err != nil {
+		logger.Error("error validating delete index request",
+			"error", err)
+		return nil, err
+	}
+
+	var deleteIndexResp DeleteIndexResponse
 	resp, err := c.reqClient.
 		R().
-		Delete(c.reqClient.BaseURL + "/indexes/" + indexName)
+		SetSuccessResult(&deleteIndexResp).
+		Delete(c.reqClient.BaseURL + "/indexes/" + deleteIndexRequest.IndexName)
 	if err != nil {
 		logger.Error("error deleting index", "error", err)
-		return err
+		return nil, err
 	}
 	if resp.Response.StatusCode != http.StatusOK {
 		logger.Error("error deleting index", "status_code", resp.
 			Response.StatusCode)
-		return fmt.Errorf("error deleting index: status code: %v",
+		return nil, fmt.Errorf("error deleting index: status code: %v",
 			resp.Response.StatusCode)
 	}
 
 	logger.Info("index deleted")
-	return nil
+	return &deleteIndexResp, nil
 }
 
 // ListIndexesResponse is the response for listing indexes
