@@ -24,7 +24,7 @@ type SearchRequest struct {
 	Offset *int    `json:"offset,omitempty"`
 	Filter *string `json:"filter,omitempty"`
 	// SearchableAttributes is the list of
-	// attributes to search in (default: ["*"])
+	// attributes to search in (default: ["*"]) --> all attributes
 	SearchableAttributes []string `json:"searchableAttributes,omitempty"`
 	// ShowHighlights return highlights for the document match.
 	// Only applicable for TENSOR search. With LEXICAL search,
@@ -34,7 +34,7 @@ type SearchRequest struct {
 	// can be LEXICAL or TENSOR (default: TENSOR)
 	SearchMethod *string `json:"searchMethod,omitempty"`
 	// AttributesToRetrieve is the list of attributes to retrieve
-	// (default: ["*"])
+	// (default: ["*"]) --> all attributes
 	AttributesToRetrieve []string `json:"attributesToRetrieve,omitempty"`
 	// ReRanker method to use for re-ranking results
 	// (default: null)
@@ -123,9 +123,6 @@ func setDefaultSearchRequest(searchRequest *SearchRequest) {
 		searchRequest.Offset = new(int)
 		*searchRequest.Offset = 0
 	}
-	if searchRequest.SearchableAttributes == nil {
-		searchRequest.SearchableAttributes = []string{"*"}
-	}
 	if searchRequest.ShowHighlights == nil {
 		searchRequest.ShowHighlights = new(bool)
 		*searchRequest.ShowHighlights = true
@@ -133,9 +130,6 @@ func setDefaultSearchRequest(searchRequest *SearchRequest) {
 	if searchRequest.SearchMethod == nil {
 		searchRequest.SearchMethod = new(string)
 		*searchRequest.SearchMethod = "TENSOR"
-	}
-	if searchRequest.AttributesToRetrieve == nil {
-		searchRequest.AttributesToRetrieve = []string{"*"}
 	}
 }
 
