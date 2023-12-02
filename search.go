@@ -8,7 +8,9 @@ import (
 
 // SearchRequest is the request to search
 type SearchRequest struct {
-	IndexName string `validate:"required" json:"-"`
+	// IndexName is the name of the index
+	// Same is used in bulk search request as well so the json tag is "index"
+	IndexName string `validate:"required" json:"index"`
 
 	// Body params
 	// Q is the query string

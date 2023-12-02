@@ -3,12 +3,7 @@ package marqo
 import (
 	"fmt"
 	"net/http"
-
-	"github.com/go-playground/validator/v10"
 )
-
-// use a single instance of Validate, it caches struct info
-var validate = validator.New()
 
 // GetModelsResponse is the response from the server
 type GetModelsResponse struct {

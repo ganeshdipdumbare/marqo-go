@@ -5,8 +5,12 @@ import (
 	"log/slog"
 	"os"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/imroc/req/v3"
 )
+
+// use a single instance of Validate, it caches struct info
+var validate = validator.New()
 
 // options for the client
 type Options func(*Client)
