@@ -12,14 +12,12 @@ The Go client(Unofficial) allows you to connect to Marqo in less than 3 lines.
 
 1. Marqo requires docker. To install Docker go to the [Docker Official website](https://docs.docker.com/get-docker/). Ensure that docker has at least 8GB memory and 50GB storage.
 
-2. Use docker to run Marqo (Mac users with M-series chips will need to [go here](#m-series-mac-users)):
+2. Use docker to run Marqo for Mac users:
 
 ```bash
+## will start marqo-os and marqo service mentioned in docker compose.
 
-docker rm -f marqo
-docker pull marqoai/marqo:latest
-docker run --name marqo -it --privileged -p 8882:8882 --add-host host.docker.internal:host-gateway marqoai/marqo:latest
-
+docker compose up -d
 ```
 
 3. Get the Marqo Go client and start using it in your program:
