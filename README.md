@@ -1,3 +1,5 @@
+[![Go](https://github.com/ganeshdipdumbare/marqo/actions/workflows/go.yml/badge.svg)](https://github.com/ganeshdipdumbare/marqo/actions/workflows/go.yml)
+
 <p align="center">
 <img src="https://uploads-ssl.webflow.com/62dfa8e3960a6e2b47dc7fae/62fdf9cef684e6f16158b094_MARQO%20LOGO-UPDATED-GREEN.svg" width="25%" height="25%">
 </p>
