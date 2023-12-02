@@ -12,7 +12,7 @@ type GetIndexSettingsRequest struct {
 
 // GetIndexSettingsResponse is the response from the server
 type GetIndexSettingsResponse struct {
-	IndexDefaults *IndexDefaults `json:"indexDefaults"`
+	IndexDefaults *IndexDefaults `json:"index_defaults"`
 }
 
 // GetIndexSettings gets the index settings from the server
