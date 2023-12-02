@@ -31,7 +31,7 @@ type SearchRequest struct {
 	// highlights will always be []. (default: true)
 	ShowHighlights *bool `json:"showHighlights,omitempty"`
 	// SearchMethod is the search method to use,
-	// can be LEXICAL or TENSOR (default: LEXICAL)
+	// can be LEXICAL or TENSOR (default: TENSOR)
 	SearchMethod *string `json:"searchMethod,omitempty"`
 	// AttributesToRetrieve is the list of attributes to retrieve
 	// (default: ["*"])
@@ -113,9 +113,36 @@ type SearchResponse struct {
 	Query string `json:"query"`
 }
 
+// setDefaultSearchRequest sets the default values for the search request
+func setDefaultSearchRequest(searchRequest *SearchRequest) {
+	if searchRequest.Limit == nil {
+		searchRequest.Limit = new(int)
+		*searchRequest.Limit = 20
+	}
+	if searchRequest.Offset == nil {
+		searchRequest.Offset = new(int)
+		*searchRequest.Offset = 0
+	}
+	if searchRequest.SearchableAttributes == nil {
+		searchRequest.SearchableAttributes = []string{"*"}
+	}
+	if searchRequest.ShowHighlights == nil {
+		searchRequest.ShowHighlights = new(bool)
+		*searchRequest.ShowHighlights = true
+	}
+	if searchRequest.SearchMethod == nil {
+		searchRequest.SearchMethod = new(string)
+		*searchRequest.SearchMethod = "TENSOR"
+	}
+	if searchRequest.AttributesToRetrieve == nil {
+		searchRequest.AttributesToRetrieve = []string{"*"}
+	}
+}
+
 // Search searches the index
 func (c *Client) Search(searchReq *SearchRequest) (*SearchResponse, error) {
 	logger := c.logger.With("method", "Search")
+	setDefaultSearchRequest(searchReq)
 	err := validate.Struct(searchReq)
 	if err != nil {
 		logger.Error("error validating search request",

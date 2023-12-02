@@ -29,6 +29,9 @@ type BulkSearchResponse struct {
 // BulkSearch searches the index
 func (c *Client) BulkSearch(bulkSearchReq *BulkSearchRequest) (*BulkSearchResponse, error) {
 	logger := c.logger.With("method", "BulkSearch")
+	for i := range bulkSearchReq.Queries {
+		setDefaultSearchRequest(&bulkSearchReq.Queries[i])
+	}
 	err := validate.Struct(bulkSearchReq)
 	if err != nil {
 		logger.Error("error validating bulk search request",
