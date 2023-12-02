@@ -50,7 +50,7 @@ func (c *Client) BulkSearch(bulkSearchReq *BulkSearchRequest) (*BulkSearchRespon
 		SetQueryParams(queryParams).
 		SetBody(bulkSearchReq).
 		SetSuccessResult(&bulkSearchResp).
-		Post(c.reqClient.BaseURL + "/indexes/bulk_search")
+		Post(c.reqClient.BaseURL + "/indexes/bulk/search")
 
 	if err != nil {
 		logger.Error("error bulk searching", "error", err)
