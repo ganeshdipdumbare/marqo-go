@@ -21,8 +21,8 @@ type BulkSearchRequest struct {
 
 // BulkSearchResponse is the response from the server
 type BulkSearchResponse struct {
-	// Results is the list of search responses
-	Results          []SearchResponse `json:"results"`
+	// Result is the list of search responses
+	Result           []SearchResponse `json:"result"`
 	ProcessingTimeMS float64          `json:"processingTimeMs"`
 }
 
