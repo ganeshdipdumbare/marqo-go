@@ -22,6 +22,8 @@ func (suite *ClientTestSuite) SetupSuite() {
 	suite.MockServer = httptest.NewServer(http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
+			// disabeling lint as this is a mock server
+			// nolint
 			w.Write([]byte(`
 			{
 				"models": [

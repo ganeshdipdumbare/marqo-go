@@ -23,6 +23,8 @@ func (suite *StatsTestSuite) SetupSuite() {
 	suite.MockServer = httptest.NewServer(http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
+			// disabeling lint as this is a mock server
+			// nolint
 			w.Write([]byte(`
 			{
 				"numberOfDocuments": 2,
@@ -49,9 +51,8 @@ func TestStatsTestSuite(t *testing.T) {
 func (suite *StatsTestSuite) TestClient_GetIndexStats() {
 	t := suite.T()
 	type fields struct {
-		url       string
-		logger    *slog.Logger
-		reqClient *req.Client
+		url    string
+		logger *slog.Logger
 	}
 	type args struct {
 		getIndexStatsReq *GetIndexStatsRequest
