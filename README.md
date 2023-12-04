@@ -4,7 +4,7 @@
 <img src="https://uploads-ssl.webflow.com/62dfa8e3960a6e2b47dc7fae/62fdf9cef684e6f16158b094_MARQO%20LOGO-UPDATED-GREEN.svg" width="25%" height="25%">
 </p>
 
-## Marqo (Unofficial Go client)
+## marqo-go (Unofficial Go client)
 
 Marqo is more than a vector database, it's an end-to-end vector search engine for both text and images. Vector generation, storage and retrieval are handled out of the box through a single API. No need to bring your own embeddings.
 
