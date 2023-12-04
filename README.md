@@ -36,7 +36,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/ganeshdipdumbare/marqo-go"
+	marqo "github.com/ganeshdipdumbare/marqo-go"
 )
 
 // Document represents a document
