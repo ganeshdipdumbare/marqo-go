@@ -8,7 +8,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/imroc/req/v3"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -37,6 +36,8 @@ func getMockServerForCreateIndex() *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
+			// disabeling lint as this is a mock server
+			// nolint
 			w.Write([]byte(`
 			{
 				"acknowledged": true,
@@ -52,7 +53,6 @@ func (suite *IndexesTestSuite) TestClient_CreateIndex() {
 	type fields struct {
 		url    string
 		logger *slog.Logger
-		client *req.Client
 	}
 	type args struct {
 		createIndexReq *CreateIndexRequest
@@ -121,20 +121,12 @@ func (suite *IndexesTestSuite) TestClient_CreateIndex() {
 	}
 }
 
-func getMockServerForDeleteIndex() *httptest.Server {
-	return httptest.NewServer(http.HandlerFunc(
-		func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusOK)
-			w.Write([]byte(`
-			{"acknowledged": true}`))
-		}),
-	)
-}
-
 func getMockServerForListIndexes() *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
+			// disabeling lint as this is a mock server
+			// nolint
 			w.Write([]byte(`
 			{
 				"results": [
@@ -155,7 +147,6 @@ func (suite *IndexesTestSuite) TestClient_ListIndexes() {
 	type fields struct {
 		url    string
 		logger *slog.Logger
-		client *req.Client
 	}
 	tests := []struct {
 		name    string
@@ -196,6 +187,121 @@ func (suite *IndexesTestSuite) TestClient_ListIndexes() {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Client.ListIndexes() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_setDefaultCreateIndexRequest(t *testing.T) {
+	type args struct {
+		createIndexReq *CreateIndexRequest
+	}
+	tests := []struct {
+		name string
+		args args
+	}{}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			setDefaultCreateIndexRequest(tt.args.createIndexReq)
+		})
+	}
+}
+
+func getMockServerForDeleteIndex(isFailureCase bool) *httptest.Server {
+	return httptest.NewServer(http.HandlerFunc(
+		func(w http.ResponseWriter, r *http.Request) {
+			if isFailureCase {
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			w.WriteHeader(http.StatusOK)
+			// disabeling lint as this is a mock server
+			// nolint
+			w.Write([]byte(`
+			{
+				"acknowledged": true
+			}`))
+		}),
+	)
+}
+
+func (suite *IndexesTestSuite) TestClient_DeleteIndex() {
+	t := suite.T()
+	mockServerSuccess := getMockServerForDeleteIndex(false)
+	mockServerFailure := getMockServerForDeleteIndex(true)
+	type fields struct {
+		url    string
+		logger *slog.Logger
+	}
+	type args struct {
+		deleteIndexRequest *DeleteIndexRequest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		want    *DeleteIndexResponse
+		wantErr bool
+	}{
+		{
+			name: "delete index successfully",
+			fields: fields{
+				url:    mockServerSuccess.URL,
+				logger: suite.Logger,
+			},
+			args: args{
+				deleteIndexRequest: &DeleteIndexRequest{
+					IndexName: "test",
+				},
+			},
+			want: &DeleteIndexResponse{
+				Acknowledged: true,
+			},
+			wantErr: false,
+		},
+		{
+			name: "delete index with empty name fails",
+			fields: fields{
+				url:    mockServerSuccess.URL,
+				logger: suite.Logger,
+			},
+			args: args{
+				deleteIndexRequest: &DeleteIndexRequest{
+					IndexName: "",
+				},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name: "delete index with failure case",
+			fields: fields{
+				url:    mockServerFailure.URL,
+				logger: suite.Logger,
+			},
+			args: args{
+				deleteIndexRequest: &DeleteIndexRequest{
+					IndexName: "test",
+				},
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c, err := NewClient(tt.fields.url, WithLogger(tt.fields.logger))
+			if err != nil {
+				t.Errorf("Client.Connect() error = %v", err)
+				return
+			}
+			got, err := c.DeleteIndex(tt.args.deleteIndexRequest)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client.DeleteIndex() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Client.DeleteIndex() = %v, want %v", got, tt.want)
 			}
 		})
 	}

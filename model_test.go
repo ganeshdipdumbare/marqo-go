@@ -45,7 +45,6 @@ func TestClient_EjectModel(t *testing.T) {
 	type fields struct {
 		url    string
 		logger *slog.Logger
-		client *req.Client
 	}
 	type args struct {
 		ejectModelReq *EjectModelRequest

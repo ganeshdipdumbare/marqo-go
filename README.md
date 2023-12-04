@@ -1,4 +1,4 @@
-[![Go](https://github.com/ganeshdipdumbare/marqo/actions/workflows/go.yml/badge.svg)](https://github.com/ganeshdipdumbare/marqo/actions/workflows/go.yml)
+[![Go](https://github.com/ganeshdipdumbare/marqo-go/actions/workflows/go.yml/badge.svg)](https://github.com/ganeshdipdumbare/marqo-go/actions/workflows/go.yml)
 
 <p align="center">
 <img src="https://uploads-ssl.webflow.com/62dfa8e3960a6e2b47dc7fae/62fdf9cef684e6f16158b094_MARQO%20LOGO-UPDATED-GREEN.svg" width="25%" height="25%">
@@ -25,7 +25,7 @@ docker compose up -d
 3. Get the Marqo Go client and start using it in your program:
 
 ```bash
-go get github.com/ganeshdipdumbare/marqo@latest
+go get github.com/ganeshdipdumbare/marqo-go@latest
 ```
 
 4. Start indexing and searching.
@@ -36,7 +36,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/ganeshdipdumbare/marqo"
+	marqo "github.com/ganeshdipdumbare/marqo-go"
 )
 
 // Document represents a document
