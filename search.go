@@ -1,6 +1,7 @@
 package marqo
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -31,7 +32,7 @@ type SearchRequest struct {
 	// highlights will always be []. (default: true)
 	ShowHighlights *bool `json:"showHighlights,omitempty"`
 	// SearchMethod is the search method to use,
-	// can be LEXICAL or TENSOR (default: TENSOR)
+	// can be LEXICAL or TENSOR or HYBRID (default: TENSOR)
 	SearchMethod *string `json:"searchMethod,omitempty"`
 	// AttributesToRetrieve is the list of attributes to retrieve
 	// (default: ["*"]) --> all attributes
@@ -74,6 +75,9 @@ type SearchRequest struct {
 	// Telemetry if true, the telemtry object is returned in the search
 	// response body. This includes information like latency metrics.
 	Telemetry *bool `json:"telemetry,omitempty"`
+
+	// HybridParameters is the hybrid search parameters
+	HybridParameters *HybridParameters `json:"hybridParameters,omitempty"`
 }
 
 // Context is the tensor context for the search
@@ -111,6 +115,27 @@ type SearchResponse struct {
 	ProcessingTimeMS float64 `json:"processingTimeMs"`
 	// Query is the query string
 	Query string `json:"query"`
+}
+
+// Hybrid search parameters
+// Example usage:
+//
+//	hybridParameters := HybridParameters{
+//	    RetrievalMethod: "disjunction",
+//	    RankingMethod:   "rrf",
+//	}
+//
+// see https://github.com/marqo-ai/marqo/blob/mainline/RELEASE.md#release-2100
+// and https://docs.marqo.ai/2.10/API-Reference/Search/search/#hybrid-parameters
+type HybridParameters struct {
+	RetrievalMethod             string          `json:"retrievalMethod"`
+	RankingMethod               string          `json:"rankingMethod"`
+	ScoreModifiersTensor        *ScoreModifiers `json:"scoreModifiers,omitempty"`
+	ScoreModifiersLexical       *ScoreModifiers `json:"scoreModifiersLexical,omitempty"`
+	SearchableAttributesLexical []string        `json:"searchableAttributesLexical,omitempty"`
+	SearchableAttributesTensor  []string        `json:"searchableAttributesTensor,omitempty"`
+	Alpha                       *float64        `json:"alpha,omitempty"`
+	RrfK                        *int            `json:"rrfK,omitempty"`
 }
 
 // setDefaultSearchRequest sets the default values for the search request
@@ -163,6 +188,26 @@ func (c *Client) Search(searchReq *SearchRequest) (*SearchResponse, error) {
 	}
 	if searchReq.SearchMethod != nil {
 		queryParams["searchMethod"] = *searchReq.SearchMethod
+	}
+	if searchReq.SearchMethod != nil && *searchReq.SearchMethod == "HYBRID" {
+		if searchReq.SearchMethod != nil && *searchReq.SearchMethod == "HYBRID" {
+			if searchReq.HybridParameters != nil {
+				if searchReq.HybridParameters.RankingMethod == "" {
+					searchReq.HybridParameters.RankingMethod = "rrf"
+				}
+				if searchReq.HybridParameters.RetrievalMethod == "" {
+					searchReq.HybridParameters.RetrievalMethod = "disjunction"
+				}
+			}
+		}
+
+		hybridParameters, err := json.Marshal(searchReq.HybridParameters)
+		if err != nil {
+			logger.Error("error marshalling hybrid parameters",
+				"error", err)
+			return nil, err
+		}
+		queryParams["hybridParameters"] = string(hybridParameters)
 	}
 	if searchReq.AttributesToRetrieve != nil {
 		queryParams["attributesToRetrieve"] = strings.Join(searchReq.AttributesToRetrieve, ",")
