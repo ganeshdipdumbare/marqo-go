@@ -190,14 +190,12 @@ func (c *Client) Search(searchReq *SearchRequest) (*SearchResponse, error) {
 		queryParams["searchMethod"] = *searchReq.SearchMethod
 	}
 	if searchReq.SearchMethod != nil && *searchReq.SearchMethod == "HYBRID" {
-		if searchReq.SearchMethod != nil && *searchReq.SearchMethod == "HYBRID" {
-			if searchReq.HybridParameters != nil {
-				if searchReq.HybridParameters.RankingMethod == "" {
-					searchReq.HybridParameters.RankingMethod = "rrf"
-				}
-				if searchReq.HybridParameters.RetrievalMethod == "" {
-					searchReq.HybridParameters.RetrievalMethod = "disjunction"
-				}
+		if searchReq.HybridParameters != nil {
+			if searchReq.HybridParameters.RankingMethod == "" {
+				searchReq.HybridParameters.RankingMethod = "rrf"
+			}
+			if searchReq.HybridParameters.RetrievalMethod == "" {
+				searchReq.HybridParameters.RetrievalMethod = "disjunction"
 			}
 		}
 
