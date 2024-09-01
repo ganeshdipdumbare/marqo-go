@@ -4,31 +4,43 @@
 <img src="https://uploads-ssl.webflow.com/62dfa8e3960a6e2b47dc7fae/62fdf9cef684e6f16158b094_MARQO%20LOGO-UPDATED-GREEN.svg" width="25%" height="25%">
 </p>
 
-## marqo-go (Unofficial Go client)
+<h1 align="center">marqo-go (Unofficial Go Client)</h1>
 
+<p align="center">
 Marqo is more than a vector database, it's an end-to-end vector search engine for both text and images. Vector generation, storage and retrieval are handled out of the box through a single API. No need to bring your own embeddings.
+</p>
 
-The Go client(Unofficial) allows you to connect to Marqo in less than 3 lines.
+## Features
 
-## Getting started
+- Easy connection to Marqo with minimal setup
+- Index creation and management
+- Document upsertion and retrieval
+- Advanced search capabilities
+- Index statistics and health monitoring
 
-1. Marqo requires docker. To install Docker go to the [Docker Official website](https://docs.docker.com/get-docker/). Ensure that docker has at least 8GB memory and 50GB storage.
+## Getting Started
 
-2. Use docker to run Marqo for Mac users:
+### Prerequisites
 
-```bash
+- [Docker](https://docs.docker.com/get-docker/) (Ensure that Docker has at least 8GB memory and 50GB storage)
+
+### Installation
+
+1. **Run Marqo using Docker** (for Mac users):
+    ```bash
 ## will start marqo-os and marqo service mentioned in docker compose.
 
 docker compose up -d
 ```
 
-3. Get the Marqo Go client and start using it in your program:
-
-```bash
+2. **Get the Marqo Go client**:
+    ```bash
 go get github.com/ganeshdipdumbare/marqo-go@latest
 ```
 
-4. Start indexing and searching.
+### Usage
+
+#### Example
 
 ```Golang
 package main
@@ -187,5 +199,18 @@ func main() {
 
 ## Improvements
 
-- Add UT for all the APIs.
-- Add end to end examples for search.
+- Add unit tests for all the APIs.
+- Add end-to-end examples for search.
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Acknowledgements
+
+- [Marqo](https://marqo.ai) for providing the vector search engine.
+- [Go](https://golang.org) for the programming language.
