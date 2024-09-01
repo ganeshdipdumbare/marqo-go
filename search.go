@@ -31,7 +31,6 @@ type SearchRequest struct {
 	// highlights will always be []. (default: true)
 	ShowHighlights *bool `json:"showHighlights,omitempty"`
 	// SearchMethod is the search method to use,
-	// can be LEXICAL or TENSOR (default: TENSOR)
 	SearchMethod *string `json:"searchMethod,omitempty"`
 	// AttributesToRetrieve is the list of attributes to retrieve
 	// (default: ["*"]) --> all attributes
@@ -133,7 +132,36 @@ func setDefaultSearchRequest(searchRequest *SearchRequest) {
 	}
 }
 
-// Search searches the index
+// Search performs a search on the server.
+//
+// This method sends a GET request to the server to perform a search with the specified query.
+//
+// Parameters:
+//
+//	searchReq (*SearchRequest): The request containing the search query.
+//
+// Returns:
+//
+//	*SearchResponse: The response from the server.
+//	error: An error if the operation fails, otherwise nil.
+//
+// The function performs the following steps:
+// 1. Validates the searchReq parameter.
+// 2. Sends a GET request to the server with the search query as query parameters.
+// 3. Checks the response status code and logs any errors.
+// 4. Returns the response from the server if the operation is successful, otherwise returns an error.
+//
+// Example usage:
+//
+//	searchReq := &SearchRequest{
+//	    IndexName: "example_index",
+//	    Q:         "example_query",
+//	}
+//	resp, err := client.Search(searchReq)
+//	if err != nil {
+//	    log.Fatalf("Failed to perform search: %v", err)
+//	}
+//	fmt.Printf("SearchResponse: %+v\n", resp)
 func (c *Client) Search(searchReq *SearchRequest) (*SearchResponse, error) {
 	logger := c.logger.With("method", "Search")
 	setDefaultSearchRequest(searchReq)

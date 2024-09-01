@@ -127,52 +127,42 @@ func setDefaultCreateIndexRequest(createIndexReq *CreateIndexRequest) {
 
 	if createIndexReq.IndexDefaults.TextPreprocessing != nil {
 		if createIndexReq.IndexDefaults.TextPreprocessing.SplitLength == nil {
-			createIndexReq.IndexDefaults.TextPreprocessing.SplitLength =
-				new(int)
+			createIndexReq.IndexDefaults.TextPreprocessing.SplitLength = new(int)
 			*createIndexReq.IndexDefaults.TextPreprocessing.SplitLength = 2
 		}
 
 		if createIndexReq.IndexDefaults.TextPreprocessing.SplitOverlap == nil {
-			createIndexReq.IndexDefaults.TextPreprocessing.SplitOverlap =
-				new(int)
+			createIndexReq.IndexDefaults.TextPreprocessing.SplitOverlap = new(int)
 			*createIndexReq.IndexDefaults.TextPreprocessing.SplitOverlap = 0
 		}
 
 		if createIndexReq.IndexDefaults.TextPreprocessing.SplitMethod == nil {
-			createIndexReq.IndexDefaults.TextPreprocessing.SplitMethod =
-				new(string)
-			*createIndexReq.IndexDefaults.TextPreprocessing.SplitMethod =
-				"sentence"
+			createIndexReq.IndexDefaults.TextPreprocessing.SplitMethod = new(string)
+			*createIndexReq.IndexDefaults.TextPreprocessing.SplitMethod = "sentence"
 		}
 	}
 
 	if createIndexReq.IndexDefaults.ImagePreprocessing != nil {
 		if createIndexReq.IndexDefaults.ImagePreprocessing.PatchMethod == nil {
-			createIndexReq.IndexDefaults.ImagePreprocessing.PatchMethod =
-				new(string)
-			*createIndexReq.IndexDefaults.ImagePreprocessing.PatchMethod =
-				"simple"
+			createIndexReq.IndexDefaults.ImagePreprocessing.PatchMethod = new(string)
+			*createIndexReq.IndexDefaults.ImagePreprocessing.PatchMethod = "simple"
 		}
 	}
 
 	if createIndexReq.IndexDefaults.ANNParameters != nil {
 		if createIndexReq.IndexDefaults.ANNParameters.SpaceType == nil {
 			createIndexReq.IndexDefaults.ANNParameters.SpaceType = new(string)
-			*createIndexReq.IndexDefaults.ANNParameters.SpaceType =
-				"cosinesimil"
+			*createIndexReq.IndexDefaults.ANNParameters.SpaceType = "cosinesimil"
 		}
 
 		if createIndexReq.IndexDefaults.ANNParameters.Parameters == nil {
-			createIndexReq.IndexDefaults.ANNParameters.Parameters =
-				new(HSNWMethodParameters)
+			createIndexReq.IndexDefaults.ANNParameters.Parameters = new(HSNWMethodParameters)
 		}
 
 		if createIndexReq.IndexDefaults.ANNParameters.Parameters.EFConstruction ==
 			nil {
-			createIndexReq.IndexDefaults.ANNParameters.Parameters.EFConstruction =
-				new(int)
-			*createIndexReq.IndexDefaults.ANNParameters.Parameters.EFConstruction =
-				128
+			createIndexReq.IndexDefaults.ANNParameters.Parameters.EFConstruction = new(int)
+			*createIndexReq.IndexDefaults.ANNParameters.Parameters.EFConstruction = 128
 		}
 
 		if createIndexReq.IndexDefaults.ANNParameters.Parameters.M == nil {
@@ -180,10 +170,38 @@ func setDefaultCreateIndexRequest(createIndexReq *CreateIndexRequest) {
 			*createIndexReq.IndexDefaults.ANNParameters.Parameters.M = 16
 		}
 	}
-
 }
 
 // CreateIndex creates an index
+//
+// This method sends a POST request to the server to create the specified index.
+//
+// Parameters:
+//
+//	createIndexReq (*CreateIndexRequest): The request containing the index details.
+//
+// Returns:
+//
+//	*CreateIndexResponse: The response from the server.
+//	error: An error if the operation fails, otherwise nil.
+//
+// The function performs the following steps:
+// 1. Sets default values for the createIndexReq parameter.
+// 2. Validates the createIndexReq parameter.
+// 3. Sends a POST request to the server with the index details in the request body.
+// 4. Checks the response status code and logs any errors.
+// 5. Returns the response from the server if the operation is successful, otherwise returns an error.
+//
+// Example usage:
+//
+//	createIndexReq := &CreateIndexRequest{
+//	    IndexName: "example_index",
+//	}
+//	resp, err := client.CreateIndex(createIndexReq)
+//	if err != nil {
+//	    log.Fatalf("Failed to create index: %v", err)
+//	}
+//	fmt.Printf("CreateIndexResponse: %+v\n", resp)
 func (c *Client) CreateIndex(createIndexReq *CreateIndexRequest) (*CreateIndexResponse, error) {
 	logger := c.logger.With("method", "CreateIndex")
 	setDefaultCreateIndexRequest(createIndexReq)
@@ -226,6 +244,34 @@ type DeleteIndexResponse struct {
 }
 
 // DeleteIndex deletes an index
+//
+// This method sends a DELETE request to the server to delete the specified index.
+//
+// Parameters:
+//
+//	deleteIndexRequest (*DeleteIndexRequest): The request containing the index name.
+//
+// Returns:
+//
+//	*DeleteIndexResponse: The response from the server.
+//	error: An error if the operation fails, otherwise nil.
+//
+// The function performs the following steps:
+// 1. Validates the deleteIndexRequest parameter.
+// 2. Sends a DELETE request to the server with the index name as a query parameter.
+// 3. Checks the response status code and logs any errors.
+// 4. Returns the response from the server if the operation is successful, otherwise returns an error.
+//
+// Example usage:
+//
+//	deleteIndexRequest := &DeleteIndexRequest{
+//	    IndexName: "example_index",
+//	}
+//	resp, err := client.DeleteIndex(deleteIndexRequest)
+//	if err != nil {
+//	    log.Fatalf("Failed to delete index: %v", err)
+//	}
+//	fmt.Printf("DeleteIndexResponse: %+v\n", resp)
 func (c *Client) DeleteIndex(deleteIndexRequest *DeleteIndexRequest) (*DeleteIndexResponse, error) {
 	logger := c.logger.With("method", "DeleteIndex")
 	err := validate.Struct(deleteIndexRequest)
