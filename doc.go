@@ -58,5 +58,9 @@ The simplest way to use Marqo is to create a new client and use its methods to i
 	}
 
 For a full guide visit https://github.com/ganeshdipdumbare/marqo-go
+
+# License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
 */
 package marqo
