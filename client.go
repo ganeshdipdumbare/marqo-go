@@ -12,7 +12,7 @@ import (
 // use a single instance of Validate, it caches struct info
 var validate = validator.New()
 
-// options for the client
+// Options for the client
 type Options func(*Client)
 
 // WithLogger sets the logger for the client
@@ -22,14 +22,22 @@ func WithLogger(logger *slog.Logger) func(*Client) {
 	}
 }
 
-// Client is the client for the marqo server
+// WithMarqoCloudAuth sets the API key for authentication if you are using MarqoCloud
+func WithMarqoCloudAuth(apiKey string) func(*Client) {
+	return func(c *Client) {
+		c.apiKey = apiKey
+	}
+}
+
+// Client is the client for the Marqo server
 type Client struct {
 	url       string
 	logger    *slog.Logger
 	reqClient *req.Client
+	apiKey    string // Field to hold the API key for use with MarqoCloud
 }
 
-// NewClient creates a new client
+// NewClient creates a new client for the Marqo server.
 func NewClient(url string, opt ...Options) (*Client, error) {
 	if url == "" {
 		return nil, fmt.Errorf("url cannot be empty")
@@ -47,6 +55,11 @@ func NewClient(url string, opt ...Options) (*Client, error) {
 	if client.reqClient == nil {
 		client.reqClient = req.NewClient()
 		client.reqClient.BaseURL = url
+
+		// Add the API key header if provided
+		if client.apiKey != "" {
+			client.reqClient.SetCommonHeader("x-api-key", client.apiKey)
+		}
 	}
 
 	// set default logger
