@@ -26,15 +26,16 @@ Marqo is more than a vector database, it's an end-to-end vector search engine fo
 
 ### Installation
 
-1. **Run Marqo using Docker** (for Mac users):
-    ```bash
-## will start marqo-os and marqo service mentioned in docker compose.
+1. Marqo requires docker. To install Docker go to the [Docker Official website](https://docs.docker.com/get-docker/). Ensure that docker has at least 8GB memory and 50GB storage.
 
+2. **Use docker to run Marqo for Mac users**:
+```bash
+## will start marqo-os and marqo service mentioned in docker compose.
 docker compose up -d
 ```
 
 2. **Get the Marqo Go client**:
-    ```bash
+```bash
 go get github.com/ganeshdipdumbare/marqo-go@latest
 ```
 
