@@ -34,7 +34,7 @@ Marqo is more than a vector database, it's an end-to-end vector search engine fo
 docker compose up -d
 ```
 
-2. **Get the Marqo Go client**:
+3. **Get the Marqo Go client**:
 ```bash
 go get github.com/ganeshdipdumbare/marqo-go@latest
 ```
